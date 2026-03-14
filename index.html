@@ -1,831 +1,461 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FLOWCAST - OpenWeather API Dashboard</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        body {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+<title>FLOWCAST - Weather Dashboard</title>
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+<style>
 
-        /* Header */
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-            text-align: center;
-        }
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+}
 
-        .header h1 {
-            font-size: 2.5em;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-        }
+body{
+background:linear-gradient(135deg,#1e3c72,#2a5298);
+min-height:100vh;
+padding:20px;
+}
 
-        .header p {
-            color: #666;
-            font-size: 1.1em;
-        }
+.container{
+max-width:1200px;
+margin:auto;
+}
 
-        /* Search Section */
-        .search-section {
-            display: flex;
-            gap: 15px;
-            max-width: 600px;
-            margin: 30px auto 0;
-        }
+/* HEADER */
 
-        .search-input {
-            flex: 1;
-            padding: 15px 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 50px;
-            font-size: 1.1em;
-            outline: none;
-            transition: 0.3s;
-        }
+.header{
+background:white;
+border-radius:20px;
+padding:30px;
+margin-bottom:30px;
+text-align:center;
+box-shadow:0 15px 35px rgba(0,0,0,0.3);
+}
 
-        .search-input:focus {
-            border-color: #2a5298;
-        }
+.header h1{
+font-size:2.5em;
+background:linear-gradient(135deg,#1e3c72,#2a5298);
+background-clip:text;
+-webkit-background-clip:text;
+color:transparent;
+margin-bottom:10px;
+}
 
-        .search-btn {
-            padding: 15px 35px;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+.header p{
+color:#666;
+}
 
-        .search-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
+.search-section{
+display:flex;
+gap:10px;
+margin-top:20px;
+justify-content:center;
+}
 
-        /* Error Message */
-        .error-message {
-            background: #ff4444;
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-            text-align: center;
-            display: none;
-        }
+.search-input{
+padding:12px;
+width:250px;
+border-radius:30px;
+border:2px solid #ddd;
+outline:none;
+}
 
-        /* Loading */
-        .loading {
-            text-align: center;
-            padding: 40px;
-            display: none;
-        }
+.search-btn{
+padding:12px 25px;
+background:#2a5298;
+color:white;
+border:none;
+border-radius:30px;
+cursor:pointer;
+}
 
-        .loading-spinner {
-            display: inline-block;
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
+.search-btn:hover{
+background:#1e3c72;
+}
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+/* ERROR */
 
-        /* Current Weather Card */
-        .current-weather {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-        }
+.error-message{
+display:none;
+background:#ff4444;
+color:white;
+padding:15px;
+border-radius:10px;
+text-align:center;
+margin-bottom:20px;
+}
 
-        .location {
-            font-size: 2em;
-            color: #333;
-            margin-bottom: 5px;
-        }
+/* LOADING */
 
-        .coordinates {
-            color: #666;
-            margin-bottom: 20px;
-            font-size: 0.9em;
-        }
+.loading{
+display:none;
+text-align:center;
+padding:30px;
+color:white;
+}
 
-        .weather-main {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
+.loading-spinner{
+width:50px;
+height:50px;
+border:5px solid rgba(255,255,255,0.3);
+border-top-color:white;
+border-radius:50%;
+animation:spin 1s linear infinite;
+margin:auto;
+}
 
-        .temperature {
-            font-size: 4em;
-            font-weight: bold;
-            color: #1e3c72;
-        }
+@keyframes spin{
+to{transform:rotate(360deg)}
+}
 
-        .weather-desc {
-            font-size: 1.5em;
-            color: #666;
-            text-transform: capitalize;
-        }
+/* WEATHER CARD */
 
-        .weather-icon img {
-            width: 100px;
-            height: 100px;
-        }
+.current-weather{
+background:white;
+padding:25px;
+border-radius:20px;
+margin-bottom:25px;
+box-shadow:0 15px 35px rgba(0,0,0,0.2);
+}
 
-        /* Weather Details Grid */
-        .details-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
+.location{
+font-size:2em;
+margin-bottom:10px;
+}
 
-        .detail-card {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-        }
+.temperature{
+font-size:3em;
+font-weight:bold;
+color:#1e3c72;
+}
 
-        .detail-label {
-            color: #555;
-            font-size: 0.9em;
-            margin-bottom: 10px;
-        }
+.details-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:20px;
+margin-top:20px;
+}
 
-        .detail-value {
-            font-size: 2em;
-            font-weight: bold;
-            color: #1e3c72;
-        }
+.detail-card{
+background:#f5f7fa;
+padding:15px;
+border-radius:10px;
+text-align:center;
+}
 
-        .detail-unit {
-            font-size: 0.8em;
-            color: #666;
-        }
+.detail-label{
+color:#666;
+}
 
-        /* Risk Assessment */
-        .risk-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
+.detail-value{
+font-size:1.5em;
+font-weight:bold;
+}
 
-        .risk-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-        }
+/* RISK SECTION */
 
-        .risk-flood {
-            border-top: 5px solid #4A90E2;
-        }
+.risk-section{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+}
 
-        .risk-heat {
-            border-top: 5px solid #FF9F1C;
-        }
+.risk-card{
+background:white;
+padding:20px;
+border-radius:20px;
+box-shadow:0 15px 35px rgba(0,0,0,0.2);
+}
 
-        .risk-title {
-            font-size: 1.3em;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+.risk-level{
+padding:5px 10px;
+border-radius:10px;
+font-weight:bold;
+}
 
-        .risk-level {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.9em;
-        }
+.risk-low{background:#00C851;color:white}
+.risk-moderate{background:#ffbb33}
+.risk-high{background:#ff8800;color:white}
+.risk-extreme{background:#ff4444;color:white}
 
-        .risk-extreme { background: #ff4444; color: white; }
-        .risk-high { background: #ff8800; color: white; }
-        .risk-moderate { background: #ffbb33; color: black; }
-        .risk-low { background: #00C851; color: white; }
+.risk-progress{
+height:10px;
+background:#eee;
+border-radius:10px;
+margin:10px 0;
+}
 
-        .risk-progress {
-            height: 10px;
-            background: #e0e0e0;
-            border-radius: 5px;
-            margin: 15px 0;
-            overflow: hidden;
-        }
+.risk-progress-bar{
+height:100%;
+background:linear-gradient(90deg,#4A90E2,#FF9F1C);
+width:0%;
+}
 
-        .risk-progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #4A90E2, #FF9F1C);
-            transition: width 0.3s;
-        }
+/* FORECAST */
 
-        .risk-detail {
-            display: flex;
-            justify-content: space-between;
-            margin: 10px 0;
-            color: #666;
-        }
+.forecast-section{
+background:white;
+padding:20px;
+margin-top:25px;
+border-radius:20px;
+}
 
-        /* Forecast Section */
-        .forecast-section {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 30px;
-        }
+.forecast-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+gap:15px;
+}
 
-        .forecast-title {
-            font-size: 1.5em;
-            color: #333;
-            margin-bottom: 20px;
-        }
+.forecast-card{
+background:#f5f7fa;
+padding:10px;
+border-radius:10px;
+text-align:center;
+}
 
-        .forecast-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
-        }
+.api-status{
+text-align:center;
+margin-top:20px;
+color:white;
+}
 
-        .forecast-card {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecf1 100%);
-            padding: 15px;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .forecast-day {
-            font-weight: bold;
-            color: #1e3c72;
-            margin-bottom: 10px;
-        }
-
-        .forecast-temp {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-
-        .forecast-desc {
-            color: #666;
-            text-transform: capitalize;
-            font-size: 0.9em;
-        }
-
-        .forecast-rain {
-            color: #4A90E2;
-            font-size: 0.9em;
-            margin-top: 5px;
-        }
-
-        /* Recent Searches */
-        .recent-searches {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 20px;
-        }
-
-        .recent-title {
-            font-size: 1.2em;
-            color: #333;
-            margin-bottom: 15px;
-        }
-
-        .recent-list {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .recent-item {
-            background: #f0f0f0;
-            padding: 8px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .recent-item:hover {
-            background: #1e3c72;
-            color: white;
-        }
-
-        /* API Status */
-        .api-status {
-            text-align: center;
-            margin-top: 20px;
-            padding: 10px;
-            font-size: 0.9em;
-            color: #666;
-        }
-
-        .status-working {
-            color: #00C851;
-        }
-
-        .status-error {
-            color: #ff4444;
-        }
-
-        @media (max-width: 768px) {
-            .risk-section {
-                grid-template-columns: 1fr;
-            }
-            
-            .search-section {
-                flex-direction: column;
-            }
-            
-            .temperature {
-                font-size: 3em;
-            }
-        }
-    </style>
+</style>
 </head>
+
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>🌊 FLOWCAST</h1>
-            <p>OpenWeatherMap API Integration - Flood & Heatwave Risk Assessment</p>
-            
-            <!-- Search Section -->
-            <div class="search-section">
-                <input type="text" class="search-input" id="cityInput" placeholder="Enter city name (e.g., Mumbai, London, Tokyo)" value="Mumbai">
-                <button class="search-btn" onclick="getWeatherData()">Get Weather</button>
-            </div>
-        </div>
 
-        <!-- Error Message -->
-        <div class="error-message" id="errorMessage"></div>
+<div class="container">
 
-        <!-- Loading -->
-        <div class="loading" id="loading">
-            <div class="loading-spinner"></div>
-            <p style="color: white; margin-top: 15px;">Fetching weather data...</p>
-        </div>
+<div class="header">
+<h1>🌊 FLOWCAST</h1>
+<p>Flood & Heatwave Risk Dashboard</p>
 
-        <!-- Main Content (initially hidden) -->
-        <div id="mainContent" style="display: none;">
-            <!-- Current Weather -->
-            <div class="current-weather">
-                <div class="location" id="cityName">--</div>
-                <div class="coordinates" id="coordinates">Lat: -- | Lon: --</div>
-                
-                <div class="weather-main">
-                    <div>
-                        <div class="temperature" id="temperature">--°C</div>
-                        <div class="weather-desc" id="weatherDesc">--</div>
-                    </div>
-                    <div class="weather-icon" id="weatherIcon">
-                        <img src="" alt="weather icon" style="display: none;">
-                    </div>
-                </div>
+<div class="search-section">
+<input id="cityInput" class="search-input" placeholder="Enter city name" value="Mumbai">
+<button class="search-btn" onclick="getWeather()">Get Weather</button>
+</div>
+</div>
 
-                <div class="details-grid">
-                    <div class="detail-card">
-                        <div class="detail-label">Feels Like</div>
-                        <div class="detail-value" id="feelsLike">--<span class="detail-unit">°C</span></div>
-                    </div>
-                    <div class="detail-card">
-                        <div class="detail-label">Humidity</div>
-                        <div class="detail-value" id="humidity">--<span class="detail-unit">%</span></div>
-                    </div>
-                    <div class="detail-card">
-                        <div class="detail-label">Pressure</div>
-                        <div class="detail-value" id="pressure">--<span class="detail-unit">hPa</span></div>
-                    </div>
-                    <div class="detail-card">
-                        <div class="detail-label">Wind Speed</div>
-                        <div class="detail-value" id="windSpeed">--<span class="detail-unit">m/s</span></div>
-                    </div>
-                </div>
-            </div>
+<div id="errorMessage" class="error-message"></div>
 
-            <!-- Risk Assessment -->
-            <div class="risk-section">
-                <!-- Flood Risk -->
-                <div class="risk-card risk-flood">
-                    <div class="risk-title">
-                        <span>🌊 Flood Risk Assessment</span>
-                        <span class="risk-level" id="floodRiskLevel">--</span>
-                    </div>
-                    
-                    <div class="risk-detail">
-                        <span>Probability</span>
-                        <span id="floodProbability">--%</span>
-                    </div>
-                    <div class="risk-progress">
-                        <div class="risk-progress-bar" id="floodProgress" style="width: 0%;"></div>
-                    </div>
-                    
-                    <div class="risk-detail">
-                        <span>Expected Rainfall (24h)</span>
-                        <span id="totalRain">--mm</span>
-                    </div>
-                    <div class="risk-detail">
-                        <span>Heavy Rain Events</span>
-                        <span id="heavyRainEvents">--</span>
-                    </div>
-                    <div class="risk-detail">
-                        <span>Recommendation</span>
-                        <span id="floodRecommendation">--</span>
-                    </div>
-                </div>
+<div id="loading" class="loading">
+<div class="loading-spinner"></div>
+<p>Loading weather data...</p>
+</div>
 
-                <!-- Heatwave Risk -->
-                <div class="risk-card risk-heat">
-                    <div class="risk-title">
-                        <span>🔥 Heatwave Risk Assessment</span>
-                        <span class="risk-level" id="heatRiskLevel">--</span>
-                    </div>
-                    
-                    <div class="risk-detail">
-                        <span>Probability</span>
-                        <span id="heatProbability">--%</span>
-                    </div>
-                    <div class="risk-progress">
-                        <div class="risk-progress-bar" id="heatProgress" style="width: 0%;"></div>
-                    </div>
-                    
-                    <div class="risk-detail">
-                        <span>Max Temperature (24h)</span>
-                        <span id="maxTemp">--°C</span>
-                    </div>
-                    <div class="risk-detail">
-                        <span>Consecutive Hot Hours</span>
-                        <span id="consecutiveHot">-- hours</span>
-                    </div>
-                    <div class="risk-detail">
-                        <span>Recommendation</span>
-                        <span id="heatRecommendation">--</span>
-                    </div>
-                </div>
-            </div>
+<div id="mainContent" style="display:none">
 
-            <!-- 5-Day Forecast -->
-            <div class="forecast-section">
-                <div class="forecast-title">📅 5-Day Forecast (3-hour intervals)</div>
-                <div class="forecast-grid" id="forecastGrid">
-                    <!-- Forecast will be populated here -->
-                </div>
-            </div>
-        </div>
+<div class="current-weather">
 
-        <!-- Recent Searches -->
-        <div class="recent-searches">
-            <div class="recent-title">Recent Searches</div>
-            <div class="recent-list" id="recentList">
-                <span class="recent-item" onclick="loadCity('Mumbai')">Mumbai</span>
-                <span class="recent-item" onclick="loadCity('London')">London</span>
-                <span class="recent-item" onclick="loadCity('Tokyo')">Tokyo</span>
-                <span class="recent-item" onclick="loadCity('New York')">New York</span>
-                <span class="recent-item" onclick="loadCity('Sydney')">Sydney</span>
-            </div>
-        </div>
+<div class="location" id="cityName">--</div>
 
-        <!-- API Status -->
-        <div class="api-status" id="apiStatus">
-            🔴 API not configured. Please add your OpenWeatherMap API key.
-        </div>
-    </div>
+<div class="temperature" id="temperature">--</div>
 
-    <script>
-        // ============================================
-        // 🔴 REPLACE WITH YOUR ACTUAL OPENWEATHER API KEY
-        // Get it from: https://home.openweathermap.org/api_keys
-        // ============================================
-        const OPENWEATHER_API_KEY = 'YOUR_OPENWEATHER_API_KEY_HERE';
-        
-        // Store recent searches
-        let recentSearches = JSON.parse(localStorage.getItem('recentSearches')) || ['Mumbai', 'London', 'Tokyo'];
-        
-        // Update recent searches display
-        function updateRecentList() {
-            const list = document.getElementById('recentList');
-            list.innerHTML = '';
-            recentSearches.slice(0, 5).forEach(city => {
-                list.innerHTML += `<span class="recent-item" onclick="loadCity('${city}')">${city}</span>`;
-            });
-        }
-        
-        // Load city from recent search
-        function loadCity(city) {
-            document.getElementById('cityInput').value = city;
-            getWeatherData();
-        }
-        
-        // Show error message
-        function showError(message) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.style.display = 'block';
-            errorDiv.textContent = message;
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'none';
-            
-            // Update API status
-            document.getElementById('apiStatus').innerHTML = `🔴 Error: ${message}`;
-            document.getElementById('apiStatus').className = 'api-status status-error';
-        }
-        
-        // Hide error
-        function hideError() {
-            document.getElementById('errorMessage').style.display = 'none';
-        }
-        
-        // Test API key first
-        async function testAPIKey() {
-            if (OPENWEATHER_API_KEY === 'YOUR_OPENWEATHER_API_KEY_HERE') {
-                showError('Please add your OpenWeatherMap API key to the code (line 342)');
-                return false;
-            }
-            
-            try {
-                const testResponse = await fetch(
-                    `https://api.openweathermap.org/data/2.5/weather?q=London&appid=${OPENWEATHER_API_KEY}&units=metric`
-                );
-                
-                if (testResponse.status === 401) {
-                    showError('Invalid API key. Please check your key or wait 1-2 hours for activation.');
-                    return false;
-                } else if (testResponse.status === 429) {
-                    showError('Rate limit exceeded. Free tier allows 60 calls/minute.');
-                    return false;
-                } else if (!testResponse.ok) {
-                    showError(`API Error: ${testResponse.status}`);
-                    return false;
-                }
-                
-                // API is working!
-                document.getElementById('apiStatus').innerHTML = '✅ OpenWeatherMap API connected successfully';
-                document.getElementById('apiStatus').className = 'api-status status-working';
-                return true;
-                
-            } catch (error) {
-                showError('Network error. Check your internet connection.');
-                return false;
-            }
-        }
-        
-        // Main function to get weather data
-        async function getWeatherData() {
-            const city = document.getElementById('cityInput').value.trim();
-            if (!city) {
-                showError('Please enter a city name');
-                return;
-            }
-            
-            hideError();
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('mainContent').style.display = 'none';
-            
-            // Test API first
-            const apiWorking = await testAPIKey();
-            if (!apiWorking) {
-                document.getElementById('loading').style.display = 'none';
-                return;
-            }
-            
-            try {
-                // Fetch current weather
-                const currentResponse = await fetch(
-                    `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${OPENWEATHER_API_KEY}&units=metric`
-                );
-                
-                if (!currentResponse.ok) {
-                    if (currentResponse.status === 404) {
-                        showError(`City "${city}" not found. Please check the spelling.`);
-                    } else if (currentResponse.status === 401) {
-                        showError('API key invalid or not activated. Wait 1-2 hours after creating a new key.');
-                    } else {
-                        showError(`Error ${currentResponse.status}: Unable to fetch weather data`);
-                    }
-                    document.getElementById('loading').style.display = 'none';
-                    return;
-                }
-                
-                const currentData = await currentResponse.json();
-                
-                // Fetch 5-day forecast
-                const forecastResponse = await fetch(
-                    `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(city)}&appid=${OPENWEATHER_API_KEY}&units=metric`
-                );
-                
-                if (!forecastResponse.ok) {
-                    console.warn('Forecast fetch failed, showing only current weather');
-                }
-                
-                const forecastData = await forecastResponse.json();
-                
-                // Update UI with data
-                updateCurrentWeather(currentData);
-                updateForecast(forecastData);
-                calculateRisks(currentData, forecastData);
-                
-                // Add to recent searches
-                if (!recentSearches.includes(city)) {
-                    recentSearches.unshift(city);
-                    if (recentSearches.length > 5) recentSearches.pop();
-                    localStorage.setItem('recentSearches', JSON.stringify(recentSearches));
-                    updateRecentList();
-                }
-                
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('mainContent').style.display = 'block';
-                
-            } catch (error) {
-                console.error('Error:', error);
-                showError('Failed to fetch weather data. Check console for details.');
-                document.getElementById('loading').style.display = 'none';
-            }
-        }
-        
-        // Update current weather display
-        function updateCurrentWeather(data) {
-            document.getElementById('cityName').textContent = `${data.name}, ${data.sys.country}`;
-            document.getElementById('coordinates').textContent = `Lat: ${data.coord.lat}° | Lon: ${data.coord.lon}°`;
-            document.getElementById('temperature').textContent = `${Math.round(data.main.temp)}°C`;
-            document.getElementById('weatherDesc').textContent = data.weather[0].description;
-            document.getElementById('feelsLike').textContent = `${Math.round(data.main.feels_like)}°C`;
-            document.getElementById('humidity').textContent = `${data.main.humidity}%`;
-            document.getElementById('pressure').textContent = `${data.main.pressure}hPa`;
-            document.getElementById('windSpeed').textContent = `${data.wind.speed}m/s`;
-            
-            // Weather icon
-            const iconCode = data.weather[0].icon;
-            const iconImg = document.querySelector('#weatherIcon img');
-            iconImg.src = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
-            iconImg.style.display = 'block';
-        }
-        
-        // Update forecast display
-        function updateForecast(data) {
-            if (!data.list) return;
-            
-            const forecastGrid = document.getElementById('forecastGrid');
-            forecastGrid.innerHTML = '';
-            
-            // Show next 8 intervals (24 hours)
-            for (let i = 0; i < 8; i++) {
-                const item = data.list[i];
-                const date = new Date(item.dt * 1000);
-                const hours = date.getHours().toString().padStart(2, '0');
-                
-                const card = document.createElement('div');
-                card.className = 'forecast-card';
-                card.innerHTML = `
-                    <div class="forecast-day">${hours}:00</div>
-                    <div class="forecast-temp">${Math.round(item.main.temp)}°C</div>
-                    <div class="forecast-desc">${item.weather[0].description}</div>
-                    <div class="forecast-rain">💧 ${item.pop ? Math.round(item.pop * 100) : 0}% rain</div>
-                `;
-                forecastGrid.appendChild(card);
-            }
-        }
-        
-        // Calculate flood and heatwave risks
-        function calculateRisks(current, forecast) {
-            // Flood risk calculation
-            let totalRain = 0;
-            let heavyRainEvents = 0;
-            
-            if (forecast.list) {
-                for (let i = 0; i < 8; i++) {
-                    const rain = forecast.list[i].rain ? forecast.list[i].rain['3h'] || 0 : 0;
-                    totalRain += rain;
-                    if (rain > 10) heavyRainEvents++;
-                }
-            }
-            
-            // Flood risk level
-            let floodRisk = 'LOW';
-            let floodProb = 0;
-            let floodRec = '';
-            
-            if (totalRain > 100) {
-                floodRisk = 'EXTREME';
-                floodProb = 90;
-                floodRec = 'Immediate evacuation prep';
-            } else if (totalRain > 50) {
-                floodRisk = 'HIGH';
-                floodProb = 70;
-                floodRec = 'Prepare for flooding';
-            } else if (totalRain > 25) {
-                floodRisk = 'MODERATE';
-                floodProb = 40;
-                floodRec = 'Stay alert';
-            } else {
-                floodRisk = 'LOW';
-                floodProb = 15;
-                floodRec = 'No action needed';
-            }
-            
-            // Update flood UI
-            document.getElementById('floodRiskLevel').textContent = floodRisk;
-            document.getElementById('floodRiskLevel').className = `risk-level risk-${floodRisk.toLowerCase()}`;
-            document.getElementById('floodProbability').textContent = `${floodProb}%`;
-            document.getElementById('floodProgress').style.width = `${floodProb}%`;
-            document.getElementById('totalRain').textContent = `${totalRain.toFixed(1)}mm`;
-            document.getElementById('heavyRainEvents').textContent = heavyRainEvents;
-            document.getElementById('floodRecommendation').textContent = floodRec;
-            
-            // Heatwave risk calculation
-            let maxTemp = current.main.temp;
-            let consecutiveHot = 0;
-            let maxStreak = 0;
-            
-            if (forecast.list) {
-                for (let i = 0; i < 8; i++) {
-                    const temp = forecast.list[i].main.temp;
-                    maxTemp = Math.max(maxTemp, temp);
-                    
-                    if (temp > 35) {
-                        consecutiveHot++;
-                        maxStreak = Math.max(maxStreak, consecutiveHot);
-                    } else {
-                        consecutiveHot = 0;
-                    }
-                }
-            }
-            
-            // Heatwave risk level
-            let heatRisk = 'LOW';
-            let heatProb = 0;
-            let heatRec = '';
-            
-            if (maxTemp > 40 || maxStreak >= 4) {
-                heatRisk = 'EXTREME';
-                heatProb = 90;
-                heatRec = 'Avoid outdoor activity';
-            } else if (maxTemp > 37 || maxStreak >= 3) {
-                heatRisk = 'HIGH';
-                heatProb = 70;
-                heatRec = 'Limit sun exposure';
-            } else if (maxTemp > 33 || maxStreak >= 2) {
-                heatRisk = 'MODERATE';
-                heatProb = 40;
-                heatRec = 'Stay hydrated';
-            } else {
-                heatRisk = 'LOW';
-                heatProb = 15;
-                heatRec = 'Normal activity';
-            }
-            
-            // Update heatwave UI
-            document.getElementById('heatRiskLevel').textContent = heatRisk;
-            document.getElementById('heatRiskLevel').className = `risk-level risk-${heatRisk.toLowerCase()}`;
-            document.getElementById('heatProbability').textContent = `${heatProb}%`;
-            document.getElementById('heatProgress').style.width = `${heatProb}%`;
-            document.getElementById('maxTemp').textContent = `${Math.round(maxTemp)}°C`;
-            document.getElementById('consecutiveHot').textContent = `${maxStreak * 3} hours`;
-            document.getElementById('heatRecommendation').textContent = heatRec;
-        }
-        
-        // Initialize on page load
-        window.onload = function() {
-            updateRecentList();
-            testAPIKey();
-            // Load default city
-            setTimeout(() => getWeatherData(), 500);
-        };
-    </script>
-</body>
-</html>
+<div class="details-grid">
+
+<div class="detail-card">
+<div class="detail-label">Humidity</div>
+<div class="detail-value" id="humidity">--</div>
+</div>
+
+<div class="detail-card">
+<div class="detail-label">Pressure</div>
+<div class="detail-value" id="pressure">--</div>
+</div>
+
+<div class="detail-card">
+<div class="detail-label">Wind Speed</div>
+<div class="detail-value" id="wind">--</div>
+</div>
+
+<div class="detail-card">
+<div class="detail-label">Feels Like</div>
+<div class="detail-value" id="feels">--</div>
+</div>
+
+</div>
+</div>
+
+<div class="risk-section">
+
+<div class="risk-card">
+<h3>🌊 Flood Risk <span id="floodRisk" class="risk-level">--</span></h3>
+
+<div class="risk-progress">
+<div id="floodBar" class="risk-progress-bar"></div>
+</div>
+
+<p>Total Rainfall: <span id="rainTotal">--</span></p>
+
+</div>
+
+<div class="risk-card">
+
+<h3>🔥 Heat Risk <span id="heatRisk" class="risk-level">--</span></h3>
+
+<div class="risk-progress">
+<div id="heatBar" class="risk-progress-bar"></div>
+</div>
+
+<p>Max Temp: <span id="maxTemp">--</span></p>
+
+</div>
+
+</div>
+
+<div class="forecast-section">
+
+<h3>Next 24 Hours Forecast</h3>
+
+<div id="forecastGrid" class="forecast-grid"></div>
+
+</div>
+
+</div>
+
+<div id="apiStatus" class="api-status">Add your OpenWeather API Key</div>
+
+</div>
+
+<script>
+
+const API_KEY = "YOUR_API_KEY_HERE";
+
+function showError(msg){
+const e=document.getElementById("errorMessage");
+e.style.display="block";
+e.innerText=msg;
+}
+
+function hideError(){
+document.getElementById("errorMessage").style.display="none";
+}
+
+async function getWeather(){
+
+const city=document.getElementById("cityInput").value;
+
+if(!city){
+showError("Enter city name");
+return;
+}
+
+hideError();
+document.getElementById("loading").style.display="block";
+
+try{
+
+const currentRes=await fetch(https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric);
+
+if(!currentRes.ok){
+showError("City not found");
+return;
+}
+
+const current=await currentRes.json();
+
+const forecastRes=await fetch(https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}&units=metric);
+
+let forecast={};
+if(forecastRes.ok){
+forecast=await forecastRes.json();
+}
+
+updateWeather(current);
+updateForecast(forecast);
+calculateRisk(current,forecast);
+
+document.getElementById("mainContent").style.display="block";
+
+}catch(err){
+showError("API Error or Network problem");
+}
+
+document.getElementById("loading").style.display="none";
+
+}
+
+function updateWeather(data){
+
+document.getElementById("cityName").innerText=data.name+", "+data.sys.country;
+document.getElementById("temperature").innerText=Math.round(data.main.temp)+"°C";
+document.getElementById("humidity").innerText=data.main.humidity+"%";
+document.getElementById("pressure").innerText=data.main.pressure+" hPa";
+document.getElementById("wind").innerText=data.wind.speed+" m/s";
+document.getElementById("feels").innerText=Math.round(data.main.feels_like)+"°C";
+
+}
+
+function updateForecast(data){
+
+if(!data.list) return;
+
+const grid=document.getElementById("forecastGrid");
+grid.innerHTML="";
+
+for(let i=0;i<8;i++){
+
+const item=data.list[i];
+const hour=new Date(item.dt*1000).getHours();
+
+grid.innerHTML+=`
+<div class="forecast-card">
+<div>${hour}:00</div>
+<div>${Math.round(item.main.temp)}°C</div>
+</div>
+`;
+
+}
+
+}
+
+function calculateRisk(current,forecast){
+
+let rain=0;
+
+if(forecast.list){
+forecast.list.slice(0,8).forEach(i=>{
+rain+=i.rain?.["3h"]||0;
+});
+}
+
+let flood="LOW",prob=10;
+
+if(rain>100){flood="EXTREME";prob=90}
+else if(rain>50){flood="HIGH";prob=70}
+else if(rain>25){flood="MODERATE";prob=40}
+
+document.getElementById("floodRisk").innerText=flood;
+document.getElementById("floodRisk").className="risk-level risk-"+flood.toLowerCase();
+document.getElementById("floodBar").style.width=prob+"%";
+document.getElementById("rainTotal").innerText=rain.toFixed(1)+" mm";
+
+let maxTemp=current.main.temp;
+
+if(forecast.list){
+forecast.list.slice(0,8).forEach(i=>{
+maxTemp=Math.max(maxTemp,i.main.temp);
+});
+}
+
+let heat="LOW",hprob=10;
+
+if(maxTemp>40){heat="EXTREME";hprob=90}
+else if(maxTemp>37){heat="HIGH";hprob=70}
+else if(maxTemp>33){heat="MODERATE";hprob=40}
+
+document.getElementById("heatRisk").innerText=heat;
+document.getElementById("heatRisk").className="risk-level risk-"+heat.toLowerCase();
+document.getElementById("heatBar").style.width=hprob+"%";
+document.getElementById("maxTemp").innerText=Math.round(maxTemp)+"°C";
+
+}
+
+window.onload=getWeather;
+
+</script>
