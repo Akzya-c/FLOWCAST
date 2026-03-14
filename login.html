@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>FLOWCAST Login</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:linear-gradient(135deg,#1e3c72,#2a5298);
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.container{
+display:flex;
+gap:30px;
+flex-wrap:wrap;
+justify-content:center;
+}
+
+.login-box{
+background:white;
+padding:30px;
+border-radius:15px;
+width:280px;
+text-align:center;
+box-shadow:0 15px 30px rgba(0,0,0,0.3);
+}
+
+h2{
+color:#1e3c72;
+margin-bottom:15px;
+}
+
+input{
+width:100%;
+padding:10px;
+margin:8px 0;
+border-radius:8px;
+border:1px solid #ccc;
+}
+
+button{
+width:100%;
+padding:10px;
+background:#2a5298;
+color:white;
+border:none;
+border-radius:8px;
+cursor:pointer;
+margin-top:10px;
+}
+
+button:hover{
+background:#1e3c72;
+}
+
+.error{
+color:red;
+margin-top:8px;
+font-size:14px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- ADMIN LOGIN -->
+
+<div class="login-box">
+
+<h2>👨‍💼 Admin Login</h2>
+
+<input type="text" id="adminUsername" placeholder="Admin Username">
+<input type="password" id="adminPassword" placeholder="Password">
+
+<button onclick="adminLogin()">Login</button>
+
+<div id="adminError" class="error"></div>
+
+</div>
+
+
+<!-- USER LOGIN -->
+
+<div class="login-box">
+
+<h2>👤 User Login</h2>
+
+<input type="text" id="userUsername" placeholder="Username">
+<input type="password" id="userPassword" placeholder="Password">
+
+<button onclick="userLogin()">Login</button>
+
+<div id="userError" class="error"></div>
+
+</div>
+
+
+<!-- VOLUNTEER LOGIN -->
+
+<div class="login-box">
+
+<h2>🚑 Volunteer Login</h2>
+
+<input type="text" id="volUsername" placeholder="Username">
+<input type="password" id="volPassword" placeholder="Password">
+
+<button onclick="volunteerLogin()">Login</button>
+
+<div id="volError" class="error"></div>
+
+</div>
+
+</div>
+
+<script>
+
+/* Demo Accounts */
+
+const admins=[{username:"admin",password:"admin123"}];
+
+const users=[
+{username:"user1",password:"1234"},
+{username:"user2",password:"1234"}
+];
+
+const volunteers=[
+{username:"volunteer1",password:"1234"},
+{username:"volunteer2",password:"1234"}
+];
+
+
+/* ADMIN LOGIN */
+
+function adminLogin(){
+
+let u=document.getElementById("adminUsername").value;
+let p=document.getElementById("adminPassword").value;
+
+let found=admins.find(a=>a.username===u && a.password===p);
+
+if(found){
+
+localStorage.setItem("role","admin");
+window.location.href="index.html";
+
+}else{
+
+document.getElementById("adminError").innerText="Invalid Admin Login";
+
+}
+
+}
+
+
+/* USER LOGIN */
+
+function userLogin(){
+
+let u=document.getElementById("userUsername").value;
+let p=document.getElementById("userPassword").value;
+
+let found=users.find(a=>a.username===u && a.password===p);
+
+if(found){
+
+localStorage.setItem("role","user");
+window.location.href="a.html";
+
+}else{
+
+document.getElementById("userError").innerText="Invalid User Login";
+
+}
+
+}
+
+
+/* VOLUNTEER LOGIN */
+
+function volunteerLogin(){
+
+let u=document.getElementById("volUsername").value;
+let p=document.getElementById("volPassword").value;
+
+let found=volunteers.find(a=>a.username===u && a.password===p);
+
+if(found){
+
+localStorage.setItem("role","volunteer");
+window.location.href="index.html";
+
+}else{
+
+document.getElementById("volError").innerText="Invalid Volunteer Login";
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
